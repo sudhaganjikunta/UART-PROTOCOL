@@ -1,0 +1,34 @@
+//UART TX TB:
+
+module uart_tx_tb( );
+reg clk,en,start;
+reg[7:0]data;
+
+wire done;
+wire busy;
+wire tx_out;
+
+
+
+uart_tx dut(.clk(clk),
+            .en(en),
+            .start(start),
+            .data(data),
+            .done(done),
+            .busy(busy),
+            .tx_out(tx_out));
+  always #5 clk=~clk;
+  initial begin
+  //$monitor("clk=%0b;en=%b;start=%b;data=%b;done=%b;busy=%b;tx out=%b",clk,en,start,data,done,bust,tx_out);
+  clk=0;en=0;data=8'b00000000;start=0;
+  #10 en=1;
+  data=8'b11100011;
+  start=1;
+  wait(done);
+  #10 start=0;
+  #10 start=1;data=8'b11001100;
+  wait(done);
+  #10 start=0;
+  #200 $finish;
+  end
+endmodule
