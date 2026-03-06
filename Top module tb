@@ -1,0 +1,50 @@
+//TOP MODULE TB:
+
+module top_tb();
+reg clk;
+reg rst;
+reg en;
+reg start;
+reg [7:0]tx_data;
+wire [7:0] rx_data;
+wire tx_done,tx_busy;
+wire rx_done,rx_busy;
+wire rx_error ;   
+
+uart_top dut(.clk(clk),
+             .rst(rst),
+             .en(en),
+             .start(start),
+             .tx_data(tx_data),
+             .rx_data(rx_data),
+             .tx_done(tx_done),
+             .rx_done(rx_done), 
+             .tx_busy(tx_busy),
+             .rx_busy(rx_busy),
+             .rx_error(rx_error));
+             
+always #5 clk=~clk;
+initial begin
+$monitor("rx_data:%b, rx_data:%b, tx_done:%b, rx_done:%b, tx_busy:%b, rx_busy:%b",
+    tx_data, rx_data, tx_done, rx_done,tx_busy, rx_busy);
+    clk=0;rst=1;en=0;start=0;tx_data=8'd0;
+    #20 rst=0;en=1;
+    #20 t_bytes(8'b10110011);
+    wait(rx_done);
+    #20 ;
+    t_bytes (8'b11001010);
+    wait(tx_done);
+    #40;
+    $finish;
+end
+task t_bytes(input [7:0]data);
+begin
+wait(!tx_busy);
+tx_data = data;
+start=1;
+#30 start=0;
+end
+endtask   
+
+     
+endmodule
