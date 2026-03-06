@@ -1,0 +1,44 @@
+//UART RX TB:
+
+module uart_rx_tb(  );
+reg clk,en,rx_data;
+wire [7:0]rx_out;
+wire busy,done,error;
+
+uart_rx dut(.clk(clk),
+            .en(en),
+            .rx_data(rx_data),
+            .rx_out(rx_out),
+            .busy(busy),
+            .done(done),
+            .error(error));
+ task send_data(input [7:0]data,input parity);
+ integer i;
+ begin
+ rx_data = 0;
+ #10;
+ for(i=0;i<8;i=i+1)begin
+ rx_data=data[i];
+ #10;
+ end
+ rx_data=parity;
+ #10;
+ rx_data=1;  //stopbit
+ #10;
+ end
+ endtask
+ always #5 clk=~clk;
+ 
+ initial begin
+ $monitor("clk:%0b;en:%b;rx-data:%b;sb-reg:%b;rx-out:%b;done:%b;busy:%b;error:%b",
+            clk,en,rx_data,dut.sb_reg,rx_out,done,busy,error);
+ clk=0;en=0;rx_data=1;
+ #10 en=1;
+ #10;
+ send_data(8'b010101101,0);
+ #10;
+ $display("test completed");
+ $display("received data:%b",rx_out);
+ $stop;
+ end
+endmodule
