@@ -1,0 +1,19 @@
+//BAYD RATE TB:
+
+module baud_tb( );
+reg clk,rst;
+wire tx_br;
+wire rx_br;
+
+
+baud_rate dut(clk,rst,tx_br,rx_br);
+
+always #5 clk=~clk;
+initial begin
+clk=0;rst=1;
+#10 rst=0;
+#900 $finish;
+end
+ 
+endmodule
+
